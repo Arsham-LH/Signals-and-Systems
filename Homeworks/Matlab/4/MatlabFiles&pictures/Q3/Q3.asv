@@ -1,0 +1,64 @@
+%% Q3 part a
+clear;clc;close all;
+img=imread("white house.jpg");
+figure('Name','main image');
+imshow(img);
+SP_noise=imnoise(img,'salt & pepper',0.1);
+figure('Name','salt & pepper noisy image');
+imshow(SP_noise);
+gauss_noise=imnoise(img,'gaussian',0,0.1);
+figure('Name','gaussian noisy image');
+imshow(gauss_noise);
+poisson_noise=imnoise(img,'poisson');
+figure('Name','poisson noisy image');
+imshow(poisson_noise);
+speckle_noise=imnoise(img,'speckle',0.1);
+figure('Name','speckle noisy image');
+imshow(speckle_noise);
+%% Q3 part b_2
+clear;clc;close all;
+img=medianFilter("white house_gaussian.jpg",5);
+imshow(img);
+title("median filter effect on gaussian noise");
+%% functions
+function filteredImg=medianFilter(fileName,kernelSize)
+
+    img=imread(fileName); %reading file
+    img=im2double(img);
+    
+    imRows=size(img(:,:,1),1); %number of picture rows
+    imCols=size(img(:,:,1),2); %number of picture columns
+    imRed=img(:,:,1); %red matrix of picture
+    imGreen=img(:,:,2); %green matrix of picture
+    imBlue=img(:,:,3); %blue matrix of picture
+    
+    newIm=zeros(imRows,imCols,3);
+    newImRed=newIm(:,:,1);
+    newImGreen=newIm(:,:,2);
+    newImBlue=newIm(:,:,3);
+    
+    for i=kernelSize+1:imRows-kernelSize %for all rows
+        for j=kernelSize+1:imCols-kernelSize %for all cols
+            %creating neighbors matrix, and reshaping it to a vactor
+            subMatrixRed=reshape(imRed(i-floor(kernelSize/2):i+floor(kernelSize/2),j-floor(kernelSize/2):j+floor(kernelSize/2)),1,[]);
+            %calculating the median of neighbors
+             newImRed(i,j)=median(subMatrixRed);
+            
+            %doing the same for green matrix
+            subMatrixGreen=reshape(imGreen(i-floor(kernelSize/2):i+floor(kernelSize/2),j-floor(kernelSize/2):j+floor(kernelSize/2)),1,[]);
+            newImGreen(i,j)=median(subMatrixGreen);
+           
+            %doing the same for blue matrix
+            subMatrixBlue=reshape(imBlue(i-floor(kernelSize/2):i+floor(kernelSize/2),j-floor(kernelSize/2):j+floor(kernelSize/2)),1,[]);
+            newImBlue(i,j)=median(subMatrixBlue);
+            
+        end
+    end
+    
+   newIm(:,:,1)=newImRed; %filtered picture red matrix
+   newIm(:,:,2)=newImGreen; %filtered picture green matrix
+   newIm(:,:,3)=newImBlue; %filtered picture blue matrix
+   filteredImg=newIm;
+end
+
+
